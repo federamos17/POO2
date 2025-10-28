@@ -7,4 +7,4 @@ Este repositorio contiene los trabajos prácticos y el código fuente desarrolla
 **Integrantes:**
 * Maidana, Martin Jose Quimey
 * Núñez, Gabriel Omar
-* Ramos Federico Javier
+* Ramos, Federico Javier
