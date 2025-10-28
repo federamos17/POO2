@@ -1,0 +1,105 @@
+@startuml
+' Título del Diagrama
+title Diagrama de Clases - TP Patrones Creacionales
+
+' --- Configuración de Apariencia ---
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam stereotypeCColor #ADD8E6 ' Color para los estereotipos
+
+' --- Definición de Clases e Interfaces ---
+
+' Requerimiento 3: Singleton
+class GestorConfiguracion <<Singleton>> {
+    - {static} instancia : GestorConfiguracion
+    - urlBd : String
+    - userBd : String
+    - pathReportes : String
+    - GestorConfiguracion()
+    + {static} getInstance() : GestorConfiguracion
+    + getUrlBd() : String
+    + getUserBd() : String
+    + getPathReportes() : String
+}
+
+' Requerimiento 2: Builder
+class Reporte <<Product>> {
+    - {readonly} titulo : String
+    - {readonly} cuerpoPrincipal : String
+    - {readonly} encabezado : String
+    - {readonly} pieDePagina : String
+    - {readonly} fecha : LocalDate
+    - {readonly} autor : String
+    - {readonly} orientacion : Orientacion
+    - Reporte(builder : ReporteBuilder)
+}
+
+class ReporteBuilder <<Builder>> {
+    - {readonly} titulo : String
+    - {readonly} cuerpoPrincipal : String
+    - encabezado : String
+    - pieDePagina : String
+    - fecha : LocalDate
+    - autor : String
+    - orientacion : Orientacion
+    + ReporteBuilder(titulo : String, cuerpoPrincipal : String)
+    + conEncabezado(String) : ReporteBuilder
+    + conPieDePagina(String) : ReporteBuilder
+    + conFecha(LocalDate) : ReporteBuilder
+    + conAutor(String) : ReporteBuilder
+    + conOrientacion(Orientacion) : ReporteBuilder
+    + build() : Reporte
+}
+
+enum Orientacion {
+    VERTICAL
+    HORIZONTAL
+}
+
+' Requerimiento 1: Factory Method
+interface RenderizadorReporte <<Product>> {
+    + renderizar(reporte : Reporte) : String
+}
+
+class RenderizadorPDF <<ConcreteProduct>> {
+    + renderizar(reporte : Reporte) : String
+}
+class RenderizadorExcel <<ConcreteProduct>> {
+    + renderizar(reporte : Reporte) : String
+}
+class RenderizadorCSV <<ConcreteProduct>> {
+    + renderizar(reporte : Reporte) : String
+}
+
+class RenderizadorFactory <<Factory>> {
+    + {static} crearRenderizador(tipo : String) : RenderizadorReporte
+}
+
+' Clase Cliente
+class Main <<Client>> {
+    + {static} main(args : String[])
+}
+
+' --- Relaciones entre Clases ---
+
+' Main (Cliente) depende de las interfaces/fábricas
+Main ..> GestorConfiguracion : <<uses>>
+Main ..> ReporteBuilder : <<uses>>
+Main ..> RenderizadorFactory : <<uses>>
+Main ..> RenderizadorReporte : <<uses>>
+
+' Relaciones del Builder
+ReporteBuilder ..> Reporte : <<creates>>
+Reporte --> Orientacion : "usa"
+ReporteBuilder --> Orientacion : "usa"
+
+' Relaciones de la Factory
+RenderizadorFactory ..> RenderizadorReporte : <<creates>>
+RenderizadorReporte <|.. RenderizadorPDF
+RenderizadorReporte <|.. RenderizadorExcel
+RenderizadorReporte <|.. RenderizadorCSV
+
+' Los renderizadores dependen del Reporte
+RenderizadorReporte ..> Reporte : <<renders>>
+
+@enduml
